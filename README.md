@@ -141,6 +141,5 @@ Version control all configuration and deployment scripts in GitHub.
 
 Extend to CI/CD pipeline using OpenShift or local Kubernetes.
 
-yaml
-Copy code
+
 
