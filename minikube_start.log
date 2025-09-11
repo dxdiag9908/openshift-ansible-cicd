@@ -1,0 +1,73 @@
+🟢 Starting Minikube setup with Docker driver as user: emmetbradley
+⚠ Docker not found. Installing...
+Updating Subscription Management repositories.
+Red Hat Enterprise Linux 9 for x86_64 - BaseOS  9.5 kB/s | 4.1 kB     00:00    
+Red Hat Enterprise Linux 9 for x86_64 - BaseOS   14 MB/s |  77 MB     00:05    
+Red Hat Enterprise Linux 9 for x86_64 - AppStre  20 kB/s | 4.5 kB     00:00    
+Red Hat Enterprise Linux 9 for x86_64 - AppStre  17 MB/s |  68 MB     00:03    
+Red Hat Ansible Automation Platform 2.3 for RHE  16 kB/s | 4.0 kB     00:00    
+Dependencies resolved.
+================================================================================
+ Package       Arch   Version            Repository                        Size
+================================================================================
+Installing:
+ podman-docker noarch 5:5.4.0-12.el9_6   rhel-9-for-x86_64-appstream-rpms 104 k
+
+Transaction Summary
+================================================================================
+Install  1 Package
+
+Total download size: 104 k
+Installed size: 11 k
+Downloading Packages:
+podman-docker-5.4.0-12.el9_6.noarch.rpm         370 kB/s | 104 kB     00:00    
+--------------------------------------------------------------------------------
+Total                                           368 kB/s | 104 kB     00:00     
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1 
+  Installing       : podman-docker-5:5.4.0-12.el9_6.noarch                  1/1 
+  Running scriptlet: podman-docker-5:5.4.0-12.el9_6.noarch                  1/1 
+  Verifying        : podman-docker-5:5.4.0-12.el9_6.noarch                  1/1 
+Installed products updated.
+
+Installed:
+  podman-docker-5:5.4.0-12.el9_6.noarch                                         
+
+Complete!
+Failed to enable unit: Unit file docker.service does not exist.
+✅ Docker service is running
+🧹 Cleaning up old Minikube resources...
+* Successfully deleted all profiles
+* Successfully purged minikube directory located at - [/home/emmetbradley/.minikube]
+* Kicbase images have not been deleted. To delete images run:
+  - docker rmi gcr.io/k8s-minikube/kicbase:v0.0.48
+🚀 Starting Minikube with 2 CPUs and 2048 MB RAM...
+* minikube v1.37.0 on Redhat 9.6
+! minikube skips various validations when --force is supplied; this may lead to unexpected behavior
+* Using the docker driver based on user configuration
+
+X "docker version --format {{.Server.Os}}-{{.Server.Version}}:{{.Server.Platform.Name}}" exit status 125: Emulate Docker CLI using podman. Create /etc/containers/nodocker to quiet msg.
+Error: template: version:1:32: executing "version" at <.Platform.Name>: can't evaluate field Platform in type *define.Version
+* Documentation: https://minikube.sigs.k8s.io/docs/drivers/docker/
+
+
+X Docker has less than 2 CPUs available, but Kubernetes requires at least 2 to be available
+
+
+X Requested cpu count 2 is greater than the available cpus of 0
+
+
+X docker only has 0MiB available, less than the required 1800MiB for Kubernetes
+
+! docker is currently using the  storage driver, setting preload=false
+
+X Exiting due to MK_USAGE: Docker has only 0MB memory but you specified 2048MB
+
+🔎 Verifying Minikube status...
+* Profile "minikube" not found. Run "minikube profile list" to view all profiles.
+  To start a cluster, run: "minikube start"
+🎉 Minikube setup completed successfully!

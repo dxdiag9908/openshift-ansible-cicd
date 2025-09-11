@@ -1,0 +1,143 @@
+🟢 Starting full Docker + Minikube setup as user: emmetbradley
+🔹 Removing podman-docker...
+Updating Subscription Management repositories.
+Dependencies resolved.
+================================================================================
+ Package       Arch   Version           Repository                         Size
+================================================================================
+Removing:
+ podman-docker noarch 5:5.4.0-12.el9_6  @rhel-9-for-x86_64-appstream-rpms  11 k
+
+Transaction Summary
+================================================================================
+Remove  1 Package
+
+Freed space: 11 k
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1 
+  Erasing          : podman-docker-5:5.4.0-12.el9_6.noarch                  1/1 
+  Running scriptlet: podman-docker-5:5.4.0-12.el9_6.noarch                  1/1 
+  Verifying        : podman-docker-5:5.4.0-12.el9_6.noarch                  1/1 
+Installed products updated.
+
+Removed:
+  podman-docker-5:5.4.0-12.el9_6.noarch                                         
+
+Complete!
+🔹 Adding Docker CE repository...
+Updating Subscription Management repositories.
+Adding repo from: https://download.docker.com/linux/centos/docker-ce.repo
+🔹 Installing Docker Engine...
+Updating Subscription Management repositories.
+Docker CE Stable - x86_64                       335 kB/s |  54 kB     00:00    
+Dependencies resolved.
+================================================================================
+ Package                     Arch     Version          Repository          Size
+================================================================================
+Installing:
+ containerd.io               x86_64   1.7.27-3.1.el9   docker-ce-stable    44 M
+ docker-buildx-plugin        x86_64   0.27.0-1.el9     docker-ce-stable    17 M
+ docker-ce                   x86_64   3:28.4.0-1.el9   docker-ce-stable    21 M
+ docker-ce-cli               x86_64   1:28.4.0-1.el9   docker-ce-stable   8.6 M
+ docker-compose-plugin       x86_64   2.39.2-1.el9     docker-ce-stable    15 M
+Installing weak dependencies:
+ docker-ce-rootless-extras   x86_64   28.4.0-1.el9     docker-ce-stable   3.4 M
+
+Transaction Summary
+================================================================================
+Install  6 Packages
+
+Total download size: 108 M
+Installed size: 435 M
+Downloading Packages:
+(1/6): docker-buildx-plugin-0.27.0-1.el9.x86_64 8.3 MB/s |  17 MB     00:02    
+(2/6): docker-ce-cli-28.4.0-1.el9.x86_64.rpm    7.5 MB/s | 8.6 MB     00:01    
+(3/6): docker-ce-rootless-extras-28.4.0-1.el9.x 5.0 MB/s | 3.4 MB     00:00    
+(4/6): docker-ce-28.4.0-1.el9.x86_64.rpm        5.1 MB/s |  21 MB     00:04    
+(5/6): containerd.io-1.7.27-3.1.el9.x86_64.rpm   10 MB/s |  44 MB     00:04    
+(6/6): docker-compose-plugin-2.39.2-1.el9.x86_6  16 MB/s |  15 MB     00:00    
+--------------------------------------------------------------------------------
+Total                                            23 MB/s | 108 MB     00:04     
+Docker CE Stable - x86_64                        20 kB/s | 1.6 kB     00:00    
+Importing GPG key 0x621E9F35:
+ Userid     : "Docker Release (CE rpm) <docker@docker.com>"
+ Fingerprint: 060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35
+ From       : https://download.docker.com/linux/centos/gpg
+Key imported successfully
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1 
+  Installing       : docker-buildx-plugin-0.27.0-1.el9.x86_64               1/6 
+  Running scriptlet: docker-buildx-plugin-0.27.0-1.el9.x86_64               1/6 
+  Installing       : docker-compose-plugin-2.39.2-1.el9.x86_64              2/6 
+  Running scriptlet: docker-compose-plugin-2.39.2-1.el9.x86_64              2/6 
+  Installing       : docker-ce-cli-1:28.4.0-1.el9.x86_64                    3/6 
+  Running scriptlet: docker-ce-cli-1:28.4.0-1.el9.x86_64                    3/6 
+  Installing       : containerd.io-1.7.27-3.1.el9.x86_64                    4/6 
+  Running scriptlet: containerd.io-1.7.27-3.1.el9.x86_64                    4/6 
+  Installing       : docker-ce-rootless-extras-28.4.0-1.el9.x86_64          5/6 
+  Running scriptlet: docker-ce-rootless-extras-28.4.0-1.el9.x86_64          5/6 
+  Installing       : docker-ce-3:28.4.0-1.el9.x86_64                        6/6 
+  Running scriptlet: docker-ce-3:28.4.0-1.el9.x86_64                        6/6 
+  Verifying        : containerd.io-1.7.27-3.1.el9.x86_64                    1/6 
+  Verifying        : docker-buildx-plugin-0.27.0-1.el9.x86_64               2/6 
+  Verifying        : docker-ce-3:28.4.0-1.el9.x86_64                        3/6 
+  Verifying        : docker-ce-cli-1:28.4.0-1.el9.x86_64                    4/6 
+  Verifying        : docker-ce-rootless-extras-28.4.0-1.el9.x86_64          5/6 
+  Verifying        : docker-compose-plugin-2.39.2-1.el9.x86_64              6/6 
+Installed products updated.
+
+Installed:
+  containerd.io-1.7.27-3.1.el9.x86_64                                           
+  docker-buildx-plugin-0.27.0-1.el9.x86_64                                      
+  docker-ce-3:28.4.0-1.el9.x86_64                                               
+  docker-ce-cli-1:28.4.0-1.el9.x86_64                                           
+  docker-ce-rootless-extras-28.4.0-1.el9.x86_64                                 
+  docker-compose-plugin-2.39.2-1.el9.x86_64                                     
+
+Complete!
+🔹 Enabling and starting Docker service...
+Created symlink /etc/systemd/system/multi-user.target.wants/docker.service → /usr/lib/systemd/system/docker.service.
+🔹 Docker version:
+Client: Docker Engine - Community
+ Version:           28.4.0
+ API version:       1.51
+ Go version:        go1.24.7
+ Git commit:        d8eb465
+ Built:             Wed Sep  3 21:00:35 2025
+ OS/Arch:           linux/amd64
+ Context:           default
+permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.51/version": dial unix /var/run/docker.sock: connect: permission denied
+🧹 Cleaning up old Minikube resources...
+* Removed all traces of the "minikube" cluster.
+* Successfully deleted all profiles
+* Successfully purged minikube directory located at - [/home/emmetbradley/.minikube]
+🚀 Starting Minikube with 2 CPUs and 2048 MB RAM...
+* minikube v1.37.0 on Redhat 9.6
+! minikube skips various validations when --force is supplied; this may lead to unexpected behavior
+* Using the docker driver based on user configuration
+
+X "docker version --format {{.Server.Os}}-{{.Server.Version}}:{{.Server.Platform.Name}}" exit status 1: permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.51/version": dial unix /var/run/docker.sock: connect: permission denied
+* Suggestion: Add your user to the 'docker' group: 'sudo usermod -aG docker $USER && newgrp docker'
+* Documentation: https://docs.docker.com/engine/install/linux-postinstall/
+
+
+X Exiting due to MK_USAGE: Ensure your Docker is running and is healthy.
+
+🔎 Verifying Minikube status...
+* Profile "minikube" not found. Run "minikube profile list" to view all profiles.
+  To start a cluster, run: "minikube start"
+E0911 09:40:23.414125    8031 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp [::1]:8080: connect: connection refused"
+E0911 09:40:23.416036    8031 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp [::1]:8080: connect: connection refused"
+E0911 09:40:23.417792    8031 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp [::1]:8080: connect: connection refused"
+E0911 09:40:23.419632    8031 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp [::1]:8080: connect: connection refused"
+E0911 09:40:23.421233    8031 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp [::1]:8080: connect: connection refused"
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+🎉 Docker + Minikube setup completed successfully!
