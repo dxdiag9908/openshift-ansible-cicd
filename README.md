@@ -1,55 +1,66 @@
-# Automated Deployment of a Simple Web Application
+Automated Deployment of a Simple Web Application
 
-This project demonstrates how to automate the deployment of a simple web application using **Ansible** and **Docker** on a RHEL 9 VM. It documents environment setup, deployment automation, verification steps, and lessons learned.
+This project demonstrates how to automate the deployment of a simple web application using Ansible and Docker, with optional Kubernetes integration. It is designed to run on a RHEL 9 VM and is fully version-controlled via GitHub.
 
----
+Phase 1: Environment Setup
 
-## Phase 1: Environment Setup
+Prepare the RHEL 9 VM for automation and containerized deployment.
 
-Prepare your RHEL 9 VM with the necessary tools for automation and container management.
+Step 1: Install Ansible
 
-### Step 1: Install Ansible
+Ansible is the automation tool used throughout this project.
 
 sudo dnf check-update
 sudo dnf install ansible -y
 ansible --version
-Step 2: Install Docker
 
+Step 2: Initial Container Runtime Setup (Podman)
+
+Originally, Podman was used, but compatibility issues with CRC prevented reliable cluster startup.
+
+sudo dnf install podman -y
+podman --version
+
+Step 3: OpenShift CLI (oc)
+
+Required to interact with OpenShift clusters.
+
+sudo dnf install openshift-clients -y
+oc version
+
+Step 4: CodeReady Containers (CRC)
+
+A minimal OpenShift cluster for local development.
+
+tar -xvf crc-*.tar.xz
+sudo mv crc /usr/local/bin
+crc start
+
+
+⚠️ Note: CRC + Podman on RHEL 9 had compatibility issues, prompting a pivot to Docker.
+
+Phase 2: Pivot to Docker
+
+Due to Podman/CRC issues, Docker is now used as the container runtime.
+
+Step 1: Install Docker
 sudo dnf install docker -y
 sudo systemctl enable docker
 sudo systemctl start docker
 docker --version
 
+Step 2: Run Nginx Container via Ansible
 
+We now deploy the web application directly in Docker, without Kubernetes.
 
-Phase 2: Pivot to Docker Deployment
-Initially, Minikube with Docker driver was used to simulate Kubernetes.
-
-Due to connectivity issues, Minikube complexity, and RHEL 9 compatibility problems with CRC/Podman, we pivoted to Docker-only deployment for simplicity and reliability.
-
-Key Points:
-No Kubernetes cluster is required.
-
-Docker containers run directly on the VM.
-
-Simplifies automation with Ansible and reduces troubleshooting overhead.
-
-Phase 3: Ansible Automation (Docker)
-In this phase, we automated deployment of a simple Nginx web application using Ansible and the community.docker collection.
-
-Steps Implemented
-Install the community.docker Ansible collection:
-
-
-ansible-galaxy collection install community.docker
-Create an inventory.ini file pointing to localhost:
-
+Inventory file (inventory.ini)
 
 [local]
 localhost ansible_connection=local
-Write the Ansible playbook deploy-app.yml:
 
----
+
+Ansible Playbook (deploy-app.yml)
+
 - name: Deploy simple web app using Docker
   hosts: localhost
   gather_facts: no
@@ -61,45 +72,75 @@ Write the Ansible playbook deploy-app.yml:
         state: started
         restart_policy: always
         ports:
-          - "8080:80"   # maps localhost:8080 → container:80
-Optionally, create a verification script verify_webapp.sh to check Docker status, container health, firewall rules, and browser access.
+          - "8080:80"
 
-Running the Playbook
+
+Run the playbook
+
 ansible-playbook -i inventory.ini deploy-app.yml
 
-Verification
-Check the container is running:
+Step 3: Verify the Web App
+
+Check container status
+
 docker ps
-Access the application in a browser:
 
-From VM GUI: http://localhost:8080
 
-From another machine on the same network: http://192.168.13.128:8080
+Access the app
 
-Expected Browser Output:
+http://localhost:8080   (or http://<VM-IP>:8080 if using VM)
 
+
+Expected output in browser
 
 Welcome to nginx!
-If you see this page, the nginx web server is successfully installed and working. Further configuration is required.
+If you see this page, the nginx web server is successfully installed and working.
 
-For online documentation and support please refer to nginx.org.
-Commercial support is available at nginx.com.
 
-Thank you for using nginx.
-Phase 4: Lessons Learned
-Ansible can directly manage Docker containers using the community.docker collection.
+Firewall (if needed)
 
-Docker-only deployment is lightweight and simpler than a full Kubernetes setup.
+sudo firewall-cmd --add-port=8080/tcp --permanent
+sudo firewall-cmd --reload
 
-Codifying deployments ensures automation, repeatability, and version control.
+Phase 3: GitHub Version Control
 
-Pivoting from Minikube resolved cluster connectivity issues and simplified testing.
+All files, logs, and scripts are tracked using GitHub.
 
-Phase 5: Next Steps
-Extend deployment automation with CI/CD pipelines triggered from GitHub.
+Steps:
 
-Maintain all configuration and deployment scripts version-controlled in GitHub.
+Add files to Git:
 
-Optionally explore full Kubernetes/OpenShift deployment for production scenarios.
+git add README.md inventory.ini deploy-app.yml verify_webapp.sh
 
-Use the verification script (verify_webapp.sh) to quickly confirm deployments
+
+Commit changes:
+
+git commit -m "Phase 3: Docker-based Ansible automation with updated README and verification script"
+
+
+Pull remote changes with rebase:
+
+git pull --rebase origin main
+
+
+Resolve any conflicts, then push:
+
+git push origin main
+
+Lessons Learned
+
+Podman vs Docker: Docker provided reliable container runtime for RHEL 9.
+
+Ansible + Docker: Automates deployment with minimal setup.
+
+Version Control: Keeping scripts, playbooks, and documentation in GitHub ensures reproducibility.
+
+Web Verification: Always verify container ports, firewall rules, and VM IP for proper access.
+
+Next Steps
+
+Extend to CI/CD pipelines triggered from GitHub.
+
+Optionally integrate Kubernetes deployment for scaling practice.
+
+Maintain documentation and scripts for future automation projects.
