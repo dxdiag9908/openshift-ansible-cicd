@@ -1,145 +1,105 @@
-# Automated Deployment of a Simple Web Application on OpenShift
+# Automated Deployment of a Simple Web Application
 
-This project demonstrates how to automate the deployment of a simple web application using Ansible, container runtimes, and OpenShift/Minikube. It documents the environment setup, issues encountered, solutions, and steps to get the project running on a RHEL 9 VM.
+This project demonstrates how to automate the deployment of a simple web application using **Ansible** and **Docker** on a RHEL 9 VM. It documents environment setup, deployment automation, verification steps, and lessons learned.
 
 ---
 
 ## Phase 1: Environment Setup
 
-This phase sets up all necessary tools on your RHEL 9 VM. This is a one-time process to prepare your system for the project.
+Prepare your RHEL 9 VM with the necessary tools for automation and container management.
 
 ### Step 1: Install Ansible
-Ansible is the primary automation tool for this project.  
 
-```bash
-# Update the system's package index
 sudo dnf check-update
-
-# Install Ansible
 sudo dnf install ansible -y
-
-# Verify installation
 ansible --version
-Step 2: Install Podman (Initial Approach)
-Podman is a daemonless container engine suitable for RHEL.
+Step 2: Install Docker
 
-bash
-Copy code
-# Install Podman
-sudo dnf install podman -y
-
-# Verify installation
-podman --version
-Step 3: Install OpenShift CLI (oc)
-The oc CLI is essential for interacting with your OpenShift cluster.
-
-bash
-Copy code
-# Install OpenShift CLI
-sudo dnf install openshift-clients -y
-
-# Verify installation
-oc version
-Step 4: Install CodeReady Containers (CRC) (Initial Approach)
-CRC provides a minimal, single-node OpenShift cluster for local development.
-
-Download CRC from the Red Hat Developer site (requires Red Hat account).
-
-Extract the tarball:
-
-bash
-Copy code
-tar -xvf crc-*.tar.xz
-Move the crc executable to a directory in your PATH:
-
-bash
-Copy code
-sudo mv crc /usr/local/bin
-Start CRC with the pull secret:
-
-bash
-Copy code
-crc start
-⚠️ Problem Encountered: CRC and Podman on RHEL 9 had compatibility issues that prevented the OpenShift cluster from starting reliably.
-
-Phase 2: Pivot to Docker and Minikube
-Due to Podman/CRC issues, we switched to Docker as the container runtime and Minikube to run a local Kubernetes cluster.
-
-Step 1: Install Docker
-Docker is used as the container runtime for Minikube.
-
-bash
-Copy code
 sudo dnf install docker -y
 sudo systemctl enable docker
 sudo systemctl start docker
 docker --version
-Step 2: Install Minikube
-Minikube provides a local Kubernetes cluster for testing and development.
-
-bash
-Copy code
-# Download Minikube (latest version)
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-
-# Install Minikube
-sudo install minikube-linux-amd64 /usr/local/bin/minikube
-
-# Verify installation
-minikube version
-Step 3: Start Minikube
-We configured Minikube to use Docker with 2 CPUs and 2 GB of RAM:
-
-bash
-Copy code
-minikube start --driver=docker --cpus=2 --memory=2048
-✅ Output confirmed the cluster started successfully.
-
-⚠️ Note: The system kubectl version was older than the Kubernetes version used by Minikube. Use the bundled Minikube kubectl to avoid incompatibilities:
-
-bash
-Copy code
-minikube kubectl -- get pods -A
-Step 4: Verify Minikube
-bash
-Copy code
-kubectl get nodes
-kubectl get pods -A
-Phase 3: Configure GitHub
-GitHub is used for version control and project portfolio.
-
-bash
-Copy code
-# Create a new repository on GitHub (e.g., openshift-ansible-cicd)
-# Clone the repository
-git clone https://github.com/dxdiag9908/openshift-ansible-cicd.git
-cd openshift-ansible-cicd
-
-# Create initial README.md
-nano README.md
-Paste the content above and save.
-
-Step 5: Commit and Push Changes
-bash
-Copy code
-git add README.md
-git commit -m "Update README: document project phases and troubleshooting"
-git push origin main
-Troubleshooting & Lessons Learned
-Podman vs Docker: Podman did not work reliably with CRC on RHEL 9; pivoting to Docker solved container runtime issues.
-
-CRC Issues: CRC required Red Hat pull secrets and often failed due to Podman integration; Minikube provided a simpler local Kubernetes environment.
-
-kubectl Version: Mismatch between system kubectl and Minikube’s Kubernetes version can cause errors. Use minikube kubectl -- ... to avoid issues.
-
-Next Steps
-Deploy a simple test pod on Minikube.
-
-Automate deployments with Ansible.
-
-Version control all configuration and deployment scripts in GitHub.
-
-Extend to CI/CD pipeline using OpenShift or local Kubernetes.
 
 
 
+Phase 2: Pivot to Docker Deployment
+Initially, Minikube with Docker driver was used to simulate Kubernetes.
+
+Due to connectivity issues, Minikube complexity, and RHEL 9 compatibility problems with CRC/Podman, we pivoted to Docker-only deployment for simplicity and reliability.
+
+Key Points:
+No Kubernetes cluster is required.
+
+Docker containers run directly on the VM.
+
+Simplifies automation with Ansible and reduces troubleshooting overhead.
+
+Phase 3: Ansible Automation (Docker)
+In this phase, we automated deployment of a simple Nginx web application using Ansible and the community.docker collection.
+
+Steps Implemented
+Install the community.docker Ansible collection:
+
+
+ansible-galaxy collection install community.docker
+Create an inventory.ini file pointing to localhost:
+
+
+[local]
+localhost ansible_connection=local
+Write the Ansible playbook deploy-app.yml:
+
+---
+- name: Deploy simple web app using Docker
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Ensure nginx container is running
+      community.docker.docker_container:
+        name: webapp
+        image: nginx:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "8080:80"   # maps localhost:8080 → container:80
+Optionally, create a verification script verify_webapp.sh to check Docker status, container health, firewall rules, and browser access.
+
+Running the Playbook
+ansible-playbook -i inventory.ini deploy-app.yml
+
+Verification
+Check the container is running:
+docker ps
+Access the application in a browser:
+
+From VM GUI: http://localhost:8080
+
+From another machine on the same network: http://192.168.13.128:8080
+
+Expected Browser Output:
+
+
+Welcome to nginx!
+If you see this page, the nginx web server is successfully installed and working. Further configuration is required.
+
+For online documentation and support please refer to nginx.org.
+Commercial support is available at nginx.com.
+
+Thank you for using nginx.
+Phase 4: Lessons Learned
+Ansible can directly manage Docker containers using the community.docker collection.
+
+Docker-only deployment is lightweight and simpler than a full Kubernetes setup.
+
+Codifying deployments ensures automation, repeatability, and version control.
+
+Pivoting from Minikube resolved cluster connectivity issues and simplified testing.
+
+Phase 5: Next Steps
+Extend deployment automation with CI/CD pipelines triggered from GitHub.
+
+Maintain all configuration and deployment scripts version-controlled in GitHub.
+
+Optionally explore full Kubernetes/OpenShift deployment for production scenarios.
+
+Use the verification script (verify_webapp.sh) to quickly confirm deployments
