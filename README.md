@@ -1,65 +1,66 @@
-Automated Deployment of a Simple Web Application
+🚀 Automated Deployment of a Simple Web Application
 
-This project demonstrates how to automate the deployment of a simple web application using Ansible and Docker, with optional Kubernetes integration. It is designed to run on a RHEL 9 VM and is fully version-controlled via GitHub.
+This project demonstrates the automation of a web application deployment using Ansible and Docker, fully tested on a RHEL 9 VM.
+It is version-controlled with GitHub and designed to showcase professional DevOps practices.
 
 Phase 1: Environment Setup
 
-Prepare the RHEL 9 VM for automation and containerized deployment.
+Prepare the RHEL 9 VM with all necessary tools.
 
-Step 1: Install Ansible
+1️⃣ Install Ansible
 
-Ansible is the automation tool used throughout this project.
+Ansible automates deployments and infrastructure tasks.
 
 sudo dnf check-update
 sudo dnf install ansible -y
 ansible --version
 
-Step 2: Initial Container Runtime Setup (Podman)
+2️⃣ Podman (Initial Approach)
 
-Originally, Podman was used, but compatibility issues with CRC prevented reliable cluster startup.
+Podman was initially used but proved incompatible with CRC on RHEL 9.
 
 sudo dnf install podman -y
 podman --version
 
-Step 3: OpenShift CLI (oc)
+3️⃣ OpenShift CLI
 
-Required to interact with OpenShift clusters.
+Install oc to manage OpenShift clusters.
 
 sudo dnf install openshift-clients -y
 oc version
 
-Step 4: CodeReady Containers (CRC)
+4️⃣ CodeReady Containers (CRC)
 
-A minimal OpenShift cluster for local development.
+CRC provides a minimal local OpenShift cluster.
 
 tar -xvf crc-*.tar.xz
 sudo mv crc /usr/local/bin
 crc start
 
 
-⚠️ Note: CRC + Podman on RHEL 9 had compatibility issues, prompting a pivot to Docker.
+⚠️ Note: CRC + Podman on RHEL 9 often failed. This led to pivoting to Docker for reliability.
 
-Phase 2: Pivot to Docker
+Phase 2: Docker Deployment
 
-Due to Podman/CRC issues, Docker is now used as the container runtime.
+Docker replaced Podman to run containers directly.
 
-Step 1: Install Docker
+1️⃣ Install Docker
 sudo dnf install docker -y
 sudo systemctl enable docker
 sudo systemctl start docker
 docker --version
 
-Step 2: Run Nginx Container via Ansible
+2️⃣ Ansible Playbook for Docker
 
-We now deploy the web application directly in Docker, without Kubernetes.
+Deploy an Nginx web server container using Ansible.
 
-Inventory file (inventory.ini)
+Inventory (inventory.ini)
 
 [local]
 localhost ansible_connection=local
 
 
-Ansible Playbook (deploy-app.yml)
+Playbook (deploy-app.yml)
 
 - name: Deploy simple web app using Docker
   hosts: localhost
@@ -74,73 +75,53 @@ Ansible Playbook (deploy-app.yml)
         ports:
           - "8080:80"
 
-
-Run the playbook
-
+3️⃣ Run the Playbook
 ansible-playbook -i inventory.ini deploy-app.yml
 
-Step 3: Verify the Web App
+4️⃣ Verify the Web App
 
-Check container status
+Check container status:
 
 docker ps
 
 
-Access the app
+Open browser at http://localhost:8080 or http://<VM-IP>:8080
 
-http://localhost:8080   (or http://<VM-IP>:8080 if using VM)
-
-
-Expected output in browser
+Expected Output:
 
 Welcome to nginx!
 If you see this page, the nginx web server is successfully installed and working.
 
 
-Firewall (if needed)
+Open firewall port if needed:
 
 sudo firewall-cmd --add-port=8080/tcp --permanent
 sudo firewall-cmd --reload
 
 Phase 3: GitHub Version Control
 
-All files, logs, and scripts are tracked using GitHub.
+All scripts and playbooks are tracked in GitHub.
 
-Steps:
-
-Add files to Git:
-
+Commit Workflow
 git add README.md inventory.ini deploy-app.yml verify_webapp.sh
-
-
-Commit changes:
-
 git commit -m "Phase 3: Docker-based Ansible automation with updated README and verification script"
-
-
-Pull remote changes with rebase:
-
-git pull --rebase origin main
-
-
-Resolve any conflicts, then push:
-
+git pull --rebase origin main   # resolve any conflicts
 git push origin main
 
 Lessons Learned
 
-Podman vs Docker: Docker provided reliable container runtime for RHEL 9.
+Docker over Podman: Provides a stable, reliable container runtime on RHEL 9.
 
-Ansible + Docker: Automates deployment with minimal setup.
+Ansible Automation: Makes deployments repeatable and version-controlled.
 
-Version Control: Keeping scripts, playbooks, and documentation in GitHub ensures reproducibility.
+Verification Matters: Always test ports, firewall rules, and VM access.
 
-Web Verification: Always verify container ports, firewall rules, and VM IP for proper access.
+GitHub Integration: Keeps infrastructure and documentation organized.
 
 Next Steps
 
-Extend to CI/CD pipelines triggered from GitHub.
+Integrate a CI/CD pipeline triggered from GitHub.
 
-Optionally integrate Kubernetes deployment for scaling practice.
+Optionally, deploy on Kubernetes for scaling practice.
 
-Maintain documentation and scripts for future automation projects.
+Maintain all scripts and documentation for professional portfolio demonstration.
