@@ -79,13 +79,10 @@ Playbook (deploy-app.yml):
 ansible-playbook -i inventory.ini deploy-app.yml
 
 4️⃣ Verify the Web App
-
-Check container status:
-
 docker ps
 
 
-Open browser at http://localhost:8080 or http://<VM-IP>:8080
+Open a browser at http://localhost:8080 or http://<VM-IP>:8080
 Expected Output: Welcome to nginx!
 
 Open firewall port if needed:
@@ -95,60 +92,59 @@ sudo firewall-cmd --reload
 
 Phase 3: VM Recovery & Lessons Learned
 
-During the above steps, the RHEL 9 VM experienced a critical failure caused by running dnf update -y, making it unbootable. This section documents the incident and recovery process.
+⚠️ Real-world incident: During the deployment, the RHEL 9 VM became unbootable after running dnf update -y. This section documents the problem, recovery, and lessons learned.
 
 Incident Overview
 
-Trigger: Running sudo dnf update -y in the RHEL 9 VM after setting up Docker/Ansible.
+Trigger: sudo dnf update -y after Docker/Ansible setup.
 
 Symptoms:
 
-VM freezing during boot.
+VM froze during boot.
 
 Errors such as unmaintained driver detected: pmtbase.
 
-GRUB menu looping and inability to reach login prompt.
+GRUB menu looping, VM could not reach login.
 
-Impact: Original VM was unusable, risking loss of project work.
+Impact: Original VM unusable; project at risk.
 
-Investigation & Troubleshooting
+Troubleshooting Steps
 
-Checked boot order and ISO attachment in VMware Workstation Pro.
+Verified boot order and ISO attachment in VMware Workstation Pro.
 
-Attempted multiple reboots, BIOS/firmware checks, and ISO reattachment.
+Attempted BIOS/firmware checks and multiple reboots.
 
-Determined issue was likely caused by updated kernel/drivers conflicting with virtual hardware.
+Determined kernel/drivers update caused virtual hardware conflict.
 
-Recovery Steps
+Recovery Process
 
-Full VM Backup (Critical Step)
+Step 1 — Backup Old VM
 
-Power off the VM completely.
+Power off VM completely.
 
-Copy entire VM folder, including .vmdk, .vmx, .nvram, .vmxf, .vmsd, and logs, to a safe location.
+Copy entire VM folder to safe location.
 
-Verified backup integrity via PowerShell:
+Verify backup contents:
 
-# Example: check backup contents
 $backupFolder = "D:\VM_Backups\RHEL9-VM_Backup"
 Get-ChildItem $backupFolder -Recurse -Filter *.vmdk
 Get-ChildItem $backupFolder -Recurse -Filter *.vmx
 Get-ChildItem $backupFolder -Recurse -Filter *.nvram
 
 
-Fresh VM Creation
+Step 2 — Fresh VM Creation
 
-Created a new RHEL 9 VM with Server with GUI profile.
+Create new RHEL 9 VM with Server with GUI.
 
-Allocated 4 GB RAM, 2 CPU cores, 20 GB disk.
+Allocate 4 GB RAM, 2 CPU cores, 20 GB disk.
 
-Booted from fresh RHEL 9.6 ISO and completed standard GUI installation.
+Boot from RHEL 9.6 ISO and complete installation.
 
-Attach Old VM Disk
+Step 3 — Attach Old VM Disk
 
-Added old .vmdk backup as a secondary disk.
+Add old .vmdk backup as secondary disk.
 
-Mounted secondary disk in fresh VM:
+Mount in fresh VM and copy project:
 
 sudo mkdir /mnt/oldvm
 lsblk                       # identify disk partition
@@ -157,23 +153,21 @@ cp -r /mnt/oldvm/project ~/project
 sudo umount /mnt/oldvm
 
 
-Project Recovery
+Step 4 — Project Recovery
 
-Old project fully restored in fresh VM.
+Project fully restored in fresh VM.
 
-Verified files, scripts, and previous work were intact.
+Verified all files, scripts, and previous work intact.
 
 Lessons Learned
 
-Backups are essential: Always backup before running system updates.
+Always backup VM before system updates.
 
-Unexpected failures happen: Updates can break VMs; plan recovery strategies.
+Updates can break VM boot unexpectedly.
 
-Systematic troubleshooting: Check boot order, ISO, BIOS, and logs before drastic measures.
+Systematic troubleshooting: boot order, ISO, BIOS, logs.
 
-Real-world resilience: Managing failed VMs is common in production environments — documenting steps is valuable.
-
-💡 Including this incident demonstrates real-world troubleshooting, backup discipline, and problem-solving skills.
+Document incidents: professional real-world skill demonstration.
 
 Phase 4: GitHub Version Control
 
@@ -188,13 +182,13 @@ git push origin main
 
 Lessons Learned
 
-Docker over Podman: Provides a stable, reliable container runtime on RHEL 9.
+Docker over Podman: Stable, reliable container runtime on RHEL 9.
 
-Ansible Automation: Makes deployments repeatable and version-controlled.
+Ansible Automation: Repeatable, version-controlled deployments.
 
-Verification Matters: Always test ports, firewall rules, and VM access.
+Verification Matters: Test ports, firewall rules, VM access.
 
-GitHub Integration: Keeps infrastructure and documentation organized.
+GitHub Integration: Keeps infrastructure organized.
 
 Next Steps
 
