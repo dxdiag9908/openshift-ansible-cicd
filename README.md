@@ -54,13 +54,13 @@ docker --version
 
 Deploy an Nginx web server container using Ansible.
 
-Inventory (inventory.ini)
+Inventory (inventory.ini):
 
 [local]
 localhost ansible_connection=local
 
 
-Playbook (deploy-app.yml)
+Playbook (deploy-app.yml):
 
 - name: Deploy simple web app using Docker
   hosts: localhost
@@ -86,25 +86,103 @@ docker ps
 
 
 Open browser at http://localhost:8080 or http://<VM-IP>:8080
-
-Expected Output:
-
-Welcome to nginx!
-If you see this page, the nginx web server is successfully installed and working.
-
+Expected Output: Welcome to nginx!
 
 Open firewall port if needed:
 
 sudo firewall-cmd --add-port=8080/tcp --permanent
 sudo firewall-cmd --reload
 
-Phase 3: GitHub Version Control
+Phase 3: VM Recovery & Lessons Learned
+
+During the above steps, the RHEL 9 VM experienced a critical failure caused by running dnf update -y, making it unbootable. This section documents the incident and recovery process.
+
+Incident Overview
+
+Trigger: Running sudo dnf update -y in the RHEL 9 VM after setting up Docker/Ansible.
+
+Symptoms:
+
+VM freezing during boot.
+
+Errors such as unmaintained driver detected: pmtbase.
+
+GRUB menu looping and inability to reach login prompt.
+
+Impact: Original VM was unusable, risking loss of project work.
+
+Investigation & Troubleshooting
+
+Checked boot order and ISO attachment in VMware Workstation Pro.
+
+Attempted multiple reboots, BIOS/firmware checks, and ISO reattachment.
+
+Determined issue was likely caused by updated kernel/drivers conflicting with virtual hardware.
+
+Recovery Steps
+
+Full VM Backup (Critical Step)
+
+Power off the VM completely.
+
+Copy entire VM folder, including .vmdk, .vmx, .nvram, .vmxf, .vmsd, and logs, to a safe location.
+
+Verified backup integrity via PowerShell:
+
+# Example: check backup contents
+$backupFolder = "D:\VM_Backups\RHEL9-VM_Backup"
+Get-ChildItem $backupFolder -Recurse -Filter *.vmdk
+Get-ChildItem $backupFolder -Recurse -Filter *.vmx
+Get-ChildItem $backupFolder -Recurse -Filter *.nvram
+
+
+Fresh VM Creation
+
+Created a new RHEL 9 VM with Server with GUI profile.
+
+Allocated 4 GB RAM, 2 CPU cores, 20 GB disk.
+
+Booted from fresh RHEL 9.6 ISO and completed standard GUI installation.
+
+Attach Old VM Disk
+
+Added old .vmdk backup as a secondary disk.
+
+Mounted secondary disk in fresh VM:
+
+sudo mkdir /mnt/oldvm
+lsblk                       # identify disk partition
+sudo mount /dev/sdb1 /mnt/oldvm
+cp -r /mnt/oldvm/project ~/project
+sudo umount /mnt/oldvm
+
+
+Project Recovery
+
+Old project fully restored in fresh VM.
+
+Verified files, scripts, and previous work were intact.
+
+Lessons Learned
+
+Backups are essential: Always backup before running system updates.
+
+Unexpected failures happen: Updates can break VMs; plan recovery strategies.
+
+Systematic troubleshooting: Check boot order, ISO, BIOS, and logs before drastic measures.
+
+Real-world resilience: Managing failed VMs is common in production environments — documenting steps is valuable.
+
+💡 Including this incident demonstrates real-world troubleshooting, backup discipline, and problem-solving skills.
+
+Phase 4: GitHub Version Control
 
 All scripts and playbooks are tracked in GitHub.
 
-Commit Workflow
+Commit Workflow:
+
 git add README.md inventory.ini deploy-app.yml verify_webapp.sh
-git commit -m "Phase 3: Docker-based Ansible automation with updated README and verification script"
+git commit -m "Phase 4: Docker-based Ansible automation with VM recovery notes"
 git pull --rebase origin main   # resolve any conflicts
 git push origin main
 
